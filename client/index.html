@@ -2,12 +2,98 @@
 <html lang="en">
 <head>
     <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
     <script type="text/babel" >
         "use strict";
     
+		let users = {};
+		let canvas, ctx, socket;
+		
+		const drawCanvas = () => {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			
+			let usersToDraw = Object.keys(users);
+			
+			for(let i = 0; i < usersToDraw.length; i++){
+				const user = users[usersToDraw[i]];
+				
+				ctx.save();
+				ctx.fillStyle = user.color || "black";
+				ctx.fillRect(user.x, user.y, user.w, user.h);
+				ctx.restore();
+			}
+		};
+		
+		const attachSocketEvents = (sock) => {
+			sock.on('updateUser', (data) => {
+				if(!users[data.username]){
+					users[data.username] = data.user;
+				} else if(users[data.username].lastUpdate < data.user.lastUpdate){
+					users[data.username] = data.user;
+				}
+				
+				drawCanvas();
+			});
+			
+			sock.on('removeUser', (data) => {
+				delete users[data.username];
+				drawCanvas();
+			});
+		}
+		
+		const bindKeys = (username) => {
+			
+			document.addEventListener('keydown', (e) => {
+				switch(e.keyCode){
+					case 38:
+						users[username].y -= 5;
+						users[username].lastUpdate = new Date().getTime();
+						socket.emit('updateUser', {username, user: users[username]});
+						break;
+					case 40:
+						users[username].y += 5;
+						users[username].lastUpdate = new Date().getTime();
+						socket.emit('updateUser', {username, user: users[username]});
+						break;
+					case 37:
+						users[username].x -= 5;
+						users[username].lastUpdate = new Date().getTime();
+						socket.emit('updateUser', {username, user: users[username]});
+						break;
+					case 39:
+						users[username].x += 5;
+						users[username].lastUpdate = new Date().getTime();
+						socket.emit('updateUser', {username, user: users[username]});
+						break;
+				};
+			});
+		};
+	
+		const init = () => {
+			socket = io.connect();
+			attachSocketEvents(socket);
+			
+			canvas = document.querySelector("#viewport");
+			ctx = canvas.getContext('2d');
+			
+			const username = `user${(Math.floor(Math.random() * 100000) + 1)}`;
+			bindKeys(username);
+			
+			let x = Math.floor(Math.random() * 350);
+			let y = Math.floor(Math.random() * 350);
+			let w = 50;
+			let h = 50;
+			
+			users[username] = {lastUpdate: 0, x, y, w, h};
+			socket.emit('updateUser', {username, user: users[username]});
+		};
+		
+		window.onload = init;
+		
     </script>
 </head>
 <body>
-
+	<canvas width="400" height="400" id="viewport"></canvas>
+	<p>Use arrow keys to move your block (black)</p>
 </body>
 </html>

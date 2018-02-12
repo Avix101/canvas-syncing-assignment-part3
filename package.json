@@ -1,0 +1,30 @@
+{
+  "name": "blans-canvas-syncing-assignment-part3",
+  "version": "1.0.0",
+  "description": "A simple web sockets application",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests Complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Avix101/canvas-syncing-assignment-part3.git"
+  },
+  "author": "Stasha Blank",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Avix101/canvas-syncing-assignment-part3/issues"
+  },
+  "homepage": "https://github.com/Avix101/canvas-syncing-assignment-part3#readme",
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
+}
